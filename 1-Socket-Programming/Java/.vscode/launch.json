@@ -1,0 +1,11 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - CLI",
+      "request": "launch",
+      "mainClass": "CLI",
+      "projectName": "Java_5733e32e"
+    }
+  ]
+}
