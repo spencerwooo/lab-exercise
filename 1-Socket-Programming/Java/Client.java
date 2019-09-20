@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**
@@ -8,7 +10,7 @@ import java.net.Socket;
 public class Client {
 
   private Socket client = null;
-  private DataInputStream userInputStream = null;
+  private BufferedReader userInput = null;
   private DataInputStream inputStream = null;
   private DataOutputStream outputStream = null;
 
@@ -29,8 +31,11 @@ public class Client {
       client = new Socket(serverAddress, serverPort);
       System.out.println("[CLIENT] Connected to server at: " + client.getRemoteSocketAddress());
 
-      userInputStream = new DataInputStream(System.in);
+      // Read user input (System.in) stream
+      userInput = new BufferedReader(new InputStreamReader(System.in));
+      // Read client input stream
       inputStream = new DataInputStream(client.getInputStream());
+      // Read client output stream
       outputStream = new DataOutputStream(client.getOutputStream());
     } catch (Exception e) {
       e.printStackTrace();
@@ -39,9 +44,13 @@ public class Client {
     String message = "";
     while (!message.equals("BYE")) {
       try {
-        message = userInputStream.readLine();
+        // Read user input
+        message = userInput.readLine();
+
+        // Write output stream, send request to server
         outputStream.writeUTF(message);
 
+        // Read from server's response
         System.out.println("[CLIENT] Server responded: " + inputStream.readUTF());
       } catch (Exception e) {
         e.printStackTrace();
@@ -50,7 +59,6 @@ public class Client {
 
     // Close connection
     try {
-      userInputStream.close();
       inputStream.close();
       outputStream.close();
       client.close();
