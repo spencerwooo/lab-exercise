@@ -1,0 +1,7 @@
+/**
+ * Client
+ */
+public class Client {
+
+
+}
