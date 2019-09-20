@@ -1,3 +1,5 @@
+<img src="https://i.loli.net/2019/09/20/eJd5ukyrxlcVBLI.png" alt="icon" align="right" width="120px"/>
+
 # 🧾 Lab Exercise - Network
 
 7 small lab exercises of BIT network experiment.
