@@ -9,7 +9,7 @@ The server is responsible for accepting client connections and sending out the r
 Data returned by the server are like:
 
 ```
-TEMPERATURE = 60	HUMIDITY = 0		LIGHT = 1
+TEMPERATURE = 60    HUMIDITY = 0    LIGHT = 1
 ```
 
 ## Usage
