@@ -13,3 +13,13 @@ TEMPERATURE = 60    HUMIDITY = 0    LIGHT = 1
 ```
 
 ## Usage
+
+![](https://i.loli.net/2019/09/20/gfQTorctm6WvYKC.png)
+
+```shell
+# Compile
+javac CLI.java
+
+# Run
+java CLI
+```
