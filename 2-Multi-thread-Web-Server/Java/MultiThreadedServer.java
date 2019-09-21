@@ -21,11 +21,14 @@ public class MultiThreadedServer implements Runnable {
       this.serverThread = Thread.currentThread();
     }
 
+    // Open server socket
     openServerSocket();
     System.out.println("[SERVER] Starting server: " + this.serverSocket.getLocalSocketAddress());
 
     while (!isStopped()) {
       Socket clientSocket = null;
+
+      // Accept connection from clients
       try {
         clientSocket = this.serverSocket.accept();
       } catch (Exception e) {
@@ -38,12 +41,15 @@ public class MultiThreadedServer implements Runnable {
       }
 
       String response = "Multi-threaded Server";
+
+      // Create new thread to handle client HTTP/1.1 requests
       new Thread(new ServerWorker(clientSocket, response)).start();
     }
 
     System.out.println("Server stopped.");
   }
 
+  // Open server socket
   private void openServerSocket() {
     try {
       this.serverSocket = new ServerSocket(this.serverPort);
@@ -52,10 +58,12 @@ public class MultiThreadedServer implements Runnable {
     }
   }
 
+  // Return server state
   private synchronized boolean isStopped() {
     return this.isStopped;
   }
 
+  // Stop server
   public synchronized void stopServer() {
     this.isStopped = true;
     try {
