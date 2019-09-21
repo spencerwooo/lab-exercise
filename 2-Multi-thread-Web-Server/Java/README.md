@@ -16,4 +16,4 @@ java MultiThreadedServer
 
 ![](https://i.loli.net/2019/09/21/cPeFzGjIsLptHaw.png)
 
-![](https://i.loli.net/2019/09/21/PZ2a8pMICvilOL5.png)
+![](https://i.loli.net/2019/09/21/q7pXn3Mkoj6bvAJ.png)
