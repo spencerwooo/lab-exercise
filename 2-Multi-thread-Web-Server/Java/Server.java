@@ -1,7 +1,0 @@
-/**
- * Server
- */
-public class Server {
-
-
-}
