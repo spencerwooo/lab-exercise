@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
  */
 public class ServerWorker implements Runnable {
 
-  private Socket clientSocket = null;
-  private String serverResponse = null;
+  protected Socket clientSocket = null;
+  protected String serverResponse = null;
 
   public ServerWorker(Socket clientSocket, String serverResponse) {
     this.clientSocket = clientSocket;
@@ -22,9 +22,20 @@ public class ServerWorker implements Runnable {
       InputStream input = clientSocket.getInputStream();
       OutputStream output = clientSocket.getOutputStream();
 
+      // Get current time & date
       LocalDateTime time = LocalDateTime.now();
+      // Get current worker thread name
+      String currentThreadName = Thread.currentThread().getName();
 
-      output.write(("HTTP/1.1 200 OK\n\nServer Worker: " + this.serverResponse + " - " + time + "\n").getBytes());
+      // Response builder
+      String response = "HTTP/1.1 200 OK\n";
+      response += "\n";
+      response += "<html><p><strong>Server Worker:</strong></p>";
+      response += "<p>" + this.serverResponse + " - " + time + " - " + currentThreadName + "</p></html>";
+
+      // Write response
+      output.write(response.getBytes());
+      // System.out.println(response);
 
       output.close();
       input.close();
@@ -34,5 +45,4 @@ public class ServerWorker implements Runnable {
       e.printStackTrace();
     }
   }
-
 }

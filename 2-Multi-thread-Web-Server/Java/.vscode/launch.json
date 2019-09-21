@@ -5,6 +5,13 @@
       "name": "CodeLens (Launch) - MultiThreadedServer",
       "request": "launch",
       "mainClass": "MultiThreadedServer",
+      "projectName": "Java_e1582620"
+    },
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - MultiThreadedServer",
+      "request": "launch",
+      "mainClass": "MultiThreadedServer",
       "projectName": "Java_6fbd396a"
     }
   ]

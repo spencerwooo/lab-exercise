@@ -37,8 +37,11 @@ public class MultiThreadedServer implements Runnable {
         throw new RuntimeException("Error accepting client connection. ", e);
       }
 
-      new Thread(new ServerWorker(clientSocket, "MultiThreaded Server")).start();
+      String response = "Multi-threaded Server";
+      new Thread(new ServerWorker(clientSocket, response)).start();
     }
+
+    System.out.println("Server stopped.");
   }
 
   private void openServerSocket() {
@@ -65,5 +68,17 @@ public class MultiThreadedServer implements Runnable {
   public static void main(String[] args) {
     MultiThreadedServer multiThreadedServer = new MultiThreadedServer(9000);
     new Thread(multiThreadedServer).start();
+
+    // Stop server after 60 seconds
+    int timeout = 60;
+
+    try {
+      Thread.sleep(timeout * 1000);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    System.out.println("[SERVER] Stopping server.");
+    multiThreadedServer.stopServer();
   }
 }
