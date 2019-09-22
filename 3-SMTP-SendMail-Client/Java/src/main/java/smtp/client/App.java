@@ -60,7 +60,7 @@ public class App {
      * @return
      */
     public String buildPrompt() {
-        String prompt = "";
+        String prompt = "\n";
         prompt += "[SMTP Client] Info:\n";
         prompt += "    Host: " + host + "\n";
         prompt += "    Mailtrap username: " + username + "\n";
@@ -90,6 +90,11 @@ public class App {
      * @param props
      */
     public void sendEmail(Properties props) {
+        // Start loading animation
+        LoadingIndicator loadingIndicator = new LoadingIndicator();
+        loadingIndicator.start();
+
+        // Init send mail parameters
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
@@ -110,9 +115,11 @@ public class App {
 
             // Send email
             Transport.send(message);
-            System.out.println("[SMTP Client] Message sent.");
+            loadingIndicator.setLoading(false);
+            System.out.println("\n[SMTP Client] Message sent.");
         } catch (MessagingException e) {
-            System.err.println("[SMTP Client] Failed to send message. " + e);
+            loadingIndicator.setLoading(false);
+            System.err.println("\n[SMTP Client] Failed to send message. " + e);
         }
     }
 
@@ -132,40 +139,40 @@ public class App {
         emailContent = props.getProperty("smtpclient.email.text");
 
         System.out.println(app.buildPrompt());
+        System.out.println("\n[SMTP Client] Type \"help\" to see a list of commands available.");
 
         // Deal with commands
         String command = "";
         Scanner scanner = new Scanner(System.in);
-        while (!(command.equals("bye") || command.equals("exit"))) {
+        while (!command.equals("bye")) {
             System.out.print("> ");
             command = scanner.nextLine();
 
             switch (command) {
             case "send":
-                System.out.print("[SMTP Client] Are you ready to send? Input \"yes\" to send.\n> ");
+                System.out.print("\n[SMTP Client] Are you ready to send? Input \"yes\" to send.\n> ");
                 command = scanner.nextLine();
                 if (command.equals("yes")) {
                     app.sendEmail(props);
                 } else {
-                    System.out.println("[SMTP Client] Mail delivery aborted.");
+                    System.out.println("\n[SMTP Client] Mail delivery aborted.");
                 }
                 break;
             case "info":
                 System.out.println(app.buildPrompt());
                 break;
             case "help":
-                System.out.println("[SMTP Client] Commands:");
+                System.out.println("\n[SMTP Client] Commands:");
                 System.out.println("    send - Send email to desired server.");
                 System.out.println("    info - Print current user info.");
                 System.out.println("    help - Print this help message.");
-                System.out.println("    bye, exit - Exit SMTP Client.");
+                System.out.println("    bye - Exit SMTP Client.");
                 break;
             case "bye":
-            case "exit":
-                System.out.println("[SMTP Client] Bye!");
+                System.out.println("\n[SMTP Client] Bye!");
                 break;
             default:
-                System.out.println("[SMTP Client] Invalid command.");
+                System.out.println("\n[SMTP Client] Invalid command.");
                 break;
             }
         }
