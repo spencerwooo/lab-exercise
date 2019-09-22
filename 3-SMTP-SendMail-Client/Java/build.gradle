@@ -34,3 +34,7 @@ application {
     // Define the main class for the application
     mainClassName = 'smtp.client.App'
 }
+
+run {
+    standardInput = System.in
+}
