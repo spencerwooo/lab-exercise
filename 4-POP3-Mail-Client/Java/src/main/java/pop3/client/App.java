@@ -27,6 +27,13 @@ public class App {
         return "[POP3 Client] Welcome to POP3 Client.";
     }
 
+    /**
+     * Retrieve properties from config.properties
+     *
+     * @param propertiesPath
+     * @return
+     * @throws IOException
+     */
     public Properties getEmailProperties(String propertiesPath) throws IOException {
         InputStream inPropertiesStream = getClass().getResourceAsStream(propertiesPath);
         Properties props = new Properties();
@@ -35,6 +42,11 @@ public class App {
         return props;
     }
 
+    /**
+     * Build console prompt
+     *
+     * @return
+     */
     public String buildPrompt() {
         String prompt = "\n";
         prompt += "[POP3 Client] Info:\n";
@@ -44,21 +56,30 @@ public class App {
         return prompt;
     }
 
+    /**
+     * Mask password with *
+     *
+     * @param password
+     * @return
+     */
     public String maskPassword(String password) {
         StringBuilder maskedPassword = new StringBuilder(password);
         maskedPassword.replace(1, password.length() - 1, "*".repeat(password.length() - 2));
         return maskedPassword.toString();
     }
 
+    /**
+     * Fetch email list from server
+     */
     public void fetchMail() {
         // Start loading animation
         LoadingIndicator loadingIndicator = new LoadingIndicator();
         loadingIndicator.start();
 
+        // Format email date
         SimpleDateFormat dateFormat = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss z", Locale.US);
 
         Properties properties = System.getProperties();
-
         properties.put("mail.pop3.host", host);
         properties.put("mail.pop3.port", "1100");
         properties.put("mail.pop3.starttls.enable", "true");
@@ -74,12 +95,13 @@ public class App {
             Folder folder = store.getFolder("INBOX");
             folder.open(Folder.READ_ONLY);
 
+            // Get messages from inbox
             Message[] messages = folder.getMessages();
 
+            // Stop loading indicator animation
             loadingIndicator.setLoading(false);
 
             System.out.println("");
-
             if (messages.length == 0) {
                 System.out.println("[POP3 Client] Inbox empty.");
             } else {
@@ -96,9 +118,11 @@ public class App {
                     System.out.println("    Content: " + message.getContent().toString().trim());
                 }
                 System.out.println("-----------------------------------------------");
+
                 System.out.println("[POP3 Client] Messages loaded.");
             }
 
+            // Close resources
             folder.close(false);
             store.close();
         } catch (Exception e) {
