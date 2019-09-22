@@ -46,11 +46,11 @@ public class ServerWorker implements Runnable {
 
       // Response builder
       String response = "";
-      response += "HTTP/1.1 200 OK\n";
-      response += "Server: Potato server v0.0.1\n";
-      response += "Date: " + time + "\n";
-      response += "Content-Type: text/html\n";
-      response += "Content-Length: " + body.length() + "\n\n";
+      response += "HTTP/1.1 200 OK\r\n";
+      response += "Server: Potato server v0.0.1\r\n";
+      response += "Date: " + time + "\r\n";
+      response += "Content-Type: text/html\r\n";
+      response += "Content-Length: " + body.length() + "\r\n\r\n";
 
       response += body;
 
