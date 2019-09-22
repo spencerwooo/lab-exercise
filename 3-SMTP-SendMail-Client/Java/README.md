@@ -46,7 +46,7 @@ gradle run -q --console=plain
 
 ### Console app
 
-[![asciicast](https://asciinema.org/a/G0Q4uIJckJZvYCEPMPFbzQm6l.svg)](https://asciinema.org/a/G0Q4uIJckJZvYCEPMPFbzQm6l?t=3)
+[![asciicast](https://asciinema.org/a/270189.svg)](https://asciinema.org/a/270189)
 
 ### SMTP Server - [Mailtrap.io](https://mailtrap.io)
 
