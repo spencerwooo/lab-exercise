@@ -3,12 +3,179 @@
  */
 package smtp.client;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Properties;
+import java.util.Scanner;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 public class App {
+    // Mailtrap.io configurations
+    private static String host;
+    private static String username;
+    private static String password;
+
+    // Email settings
+    private static String sender;
+    private static String receiver;
+    private static String emailSubject;
+    private static String emailContent;
+
+    /**
+     * SMTP Client greetings
+     *
+     * @return
+     */
     public String getGreeting() {
-        return "Hello world.";
+        return "[SMTP Client] Welcome to SMTP Client.";
     }
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+    /**
+     * Get SMTP server and email properties
+     *
+     * @param propertiesPath
+     * @return
+     * @throws IOException
+     */
+    public Properties getEmailProperties(String propertiesPath) throws IOException {
+        InputStream inPropertiesStream = getClass().getResourceAsStream(propertiesPath);
+        Properties props = new Properties();
+        InputStreamReader inputStreamReader = new InputStreamReader(inPropertiesStream, "UTF-8");
+        props.load(inputStreamReader);
+        return props;
+    }
+
+    /**
+     * Build prompt
+     *
+     * @return
+     */
+    public String buildPrompt() {
+        String prompt = "\n";
+        prompt += "[SMTP Client] Info:\n";
+        prompt += "    Host: " + host + "\n";
+        prompt += "    Mailtrap username: " + username + "\n";
+        prompt += "    Mailtrap password: " + maskPassword(password) + "\n";
+        prompt += "    Sender: " + sender + "\n";
+        prompt += "    Receiver: " + receiver + "\n";
+        prompt += "    Subject: " + emailSubject + "\n";
+        prompt += "    Text: " + emailContent;
+        return prompt;
+    }
+
+    /**
+     * Mask password
+     *
+     * @param password
+     * @return
+     */
+    public String maskPassword(String password) {
+        StringBuilder maskedPassword = new StringBuilder(password);
+        maskedPassword.replace(1, password.length() - 1, "*".repeat(password.length() - 2));
+        return maskedPassword.toString();
+    }
+
+    /**
+     * Send email main method
+     *
+     * @param props
+     */
+    public void sendEmail(Properties props) {
+        // Start loading animation
+        LoadingIndicator loadingIndicator = new LoadingIndicator();
+        loadingIndicator.start();
+
+        // Init send mail parameters
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "25");
+        Session session = Session.getDefaultInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+            // Compose new email
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(sender));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(receiver));
+            message.setSubject(emailSubject);
+            message.setText(emailContent);
+
+            // Send email
+            Transport.send(message);
+            loadingIndicator.setLoading(false);
+            System.out.println("\n[SMTP Client] Message sent.");
+        } catch (MessagingException e) {
+            loadingIndicator.setLoading(false);
+            System.err.println("\n[SMTP Client] Failed to send message. " + e);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        App app = new App();
+        System.out.println(app.getGreeting());
+
+        // Init email properties
+        Properties props = app.getEmailProperties("/config.properties");
+        host = props.getProperty("smtpclient.host");
+        username = props.getProperty("smtpclient.mailtrap.username");
+        password = props.getProperty("smtpclient.mailtrap.password");
+
+        sender = props.getProperty("smtpclient.send.from");
+        receiver = props.getProperty("smtpclient.send.to");
+        emailSubject = props.getProperty("smtpclient.email.subject");
+        emailContent = props.getProperty("smtpclient.email.text");
+
+        System.out.println(app.buildPrompt());
+        System.out.println("\n[SMTP Client] Type \"help\" to see a list of commands available.");
+
+        // Deal with commands
+        String command = "";
+        Scanner scanner = new Scanner(System.in);
+        while (!command.equals("bye")) {
+            System.out.print("> ");
+            command = scanner.nextLine();
+
+            switch (command) {
+            case "send":
+                System.out.print("\n[SMTP Client] Are you ready to send? Input \"yes\" to send.\n> ");
+                command = scanner.nextLine();
+                if (command.equals("yes")) {
+                    app.sendEmail(props);
+                } else {
+                    System.out.println("\n[SMTP Client] Mail delivery aborted.");
+                }
+                break;
+            case "info":
+                System.out.println(app.buildPrompt());
+                break;
+            case "help":
+                System.out.println("\n[SMTP Client] Commands:");
+                System.out.println("    send - Send email to desired server.");
+                System.out.println("    info - Print current user info.");
+                System.out.println("    help - Print this help message.");
+                System.out.println("    bye - Exit SMTP Client.");
+                break;
+            case "bye":
+                System.out.println("\n[SMTP Client] Bye!");
+                break;
+            default:
+                System.out.println("\n[SMTP Client] Invalid command.");
+                break;
+            }
+        }
+        scanner.close();
     }
 }
