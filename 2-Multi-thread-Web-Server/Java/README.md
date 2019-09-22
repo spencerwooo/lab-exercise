@@ -1,4 +1,4 @@
-# Project2 Multi-thread Web Server
+# Project 2 - Multi-thread Web Server
 
 ## Target
 
