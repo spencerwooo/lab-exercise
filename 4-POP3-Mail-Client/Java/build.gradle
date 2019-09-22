@@ -24,6 +24,9 @@ dependencies {
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:28.0-jre'
 
+    // https://mvnrepository.com/artifact/com.sun.mail/javax.mail
+    compile group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
+
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
@@ -31,4 +34,8 @@ dependencies {
 application {
     // Define the main class for the application
     mainClassName = 'pop3.client.App'
+}
+
+run {
+    standardInput = System.in
 }

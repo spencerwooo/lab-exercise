@@ -14,7 +14,7 @@ public class LoadingIndicator extends Thread {
     String animation = "|/-\\";
     int i = 0;
     while (loading) {
-      System.out.print("\r[SMTP Client] Sending " + animation.charAt(i++ % animation.length()));
+      System.out.print("\r[POP3 Client] Fetching " + animation.charAt(i++ % animation.length()));
       try {
         Thread.sleep(100);
       } catch (Exception e) {

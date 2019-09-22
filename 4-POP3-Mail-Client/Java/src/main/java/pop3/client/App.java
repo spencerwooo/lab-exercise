@@ -3,12 +3,152 @@
  */
 package pop3.client;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.Scanner;
+
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.Message.RecipientType;
+import javax.mail.Session;
+import javax.mail.Store;
+
 public class App {
+    // Mailtrap.io configurations
+    private static String host;
+    private static String username;
+    private static String password;
+
     public String getGreeting() {
         return "[POP3 Client] Welcome to POP3 Client.";
     }
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+    public Properties getEmailProperties(String propertiesPath) throws IOException {
+        InputStream inPropertiesStream = getClass().getResourceAsStream(propertiesPath);
+        Properties props = new Properties();
+        InputStreamReader inputStreamReader = new InputStreamReader(inPropertiesStream, "UTF-8");
+        props.load(inputStreamReader);
+        return props;
+    }
+
+    public String buildPrompt() {
+        String prompt = "\n";
+        prompt += "[POP3 Client] Info:\n";
+        prompt += "    Host: " + host + "\n";
+        prompt += "    Mailtrap username: " + username + "\n";
+        prompt += "    Mailtrap password: " + maskPassword(password) + "\n";
+        return prompt;
+    }
+
+    public String maskPassword(String password) {
+        StringBuilder maskedPassword = new StringBuilder(password);
+        maskedPassword.replace(1, password.length() - 1, "*".repeat(password.length() - 2));
+        return maskedPassword.toString();
+    }
+
+    public void fetchMail() {
+        // Start loading animation
+        LoadingIndicator loadingIndicator = new LoadingIndicator();
+        loadingIndicator.start();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss z", Locale.US);
+
+        Properties properties = System.getProperties();
+
+        properties.put("mail.pop3.host", host);
+        properties.put("mail.pop3.port", "1100");
+        properties.put("mail.pop3.starttls.enable", "true");
+
+        Session session = Session.getDefaultInstance(properties);
+
+        try {
+            // Create POP3 store object and connect with POP3 server
+            Store store = session.getStore("pop3");
+            store.connect(host, username, password);
+
+            // Create folder object and open read only mode
+            Folder folder = store.getFolder("INBOX");
+            folder.open(Folder.READ_ONLY);
+
+            Message[] messages = folder.getMessages();
+
+            loadingIndicator.setLoading(false);
+
+            System.out.println("");
+
+            if (messages.length == 0) {
+                System.out.println("[POP3 Client] Inbox empty.");
+            } else {
+                System.out.println("[POP3 Client] Inbox:");
+
+                for (int i = 0; i < messages.length; i++) {
+                    Message message = messages[i];
+                    System.out.println("-----------------------------------------------");
+                    System.out.println("    [No." + (i + 1) + "]");
+                    System.out.println("    Date: " + dateFormat.format(message.getSentDate()));
+                    System.out.println("    Subject: " + message.getSubject());
+                    System.out.println("    Sender: " + message.getFrom()[0].toString());
+                    System.out.println("    Receiver: " + message.getRecipients(RecipientType.TO)[0].toString());
+                    System.out.println("    Content: " + message.getContent().toString().trim());
+                }
+                System.out.println("-----------------------------------------------");
+                System.out.println("[POP3 Client] Messages loaded.");
+            }
+
+            folder.close(false);
+            store.close();
+        } catch (Exception e) {
+            loadingIndicator.setLoading(false);
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        App app = new App();
+        System.out.println(app.getGreeting());
+
+        // Init email properties
+        Properties props = app.getEmailProperties("/config.properties");
+        host = props.getProperty("pop3client.host");
+        username = props.getProperty("pop3client.mailtrap.username");
+        password = props.getProperty("pop3client.mailtrap.password");
+
+        System.out.println(app.buildPrompt());
+        System.out.println("[POP3 Client] Type \"help\" to see a list of commands available.");
+
+        // Deal with commands
+        String command = "";
+        Scanner scanner = new Scanner(System.in);
+        while (!command.equals("bye")) {
+            System.out.print("> ");
+            command = scanner.nextLine();
+
+            switch (command) {
+            case "fetch":
+                app.fetchMail();
+                break;
+            case "info":
+                System.out.println(app.buildPrompt());
+                break;
+            case "help":
+                System.out.println("\n[POP3 Client] Commands:");
+                System.out.println("    fetch - Fetch inbox.");
+                System.out.println("    info - Print current user info.");
+                System.out.println("    help - Print this help message.");
+                System.out.println("    bye - Exit POP3 Client.");
+                break;
+            case "bye":
+                System.out.println("\n[POP3 Client] Bye!");
+                break;
+            default:
+                System.out.println("\n[POP3 Client] Invalid command.");
+                break;
+            }
+        }
+        scanner.close();
     }
 }
