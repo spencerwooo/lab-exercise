@@ -1,2 +1,3 @@
-�ȴ�TCP-receiver.exe
-�ٴ�TCP-sender.exe
+先运行 `TCP-receiver.exe`
+
+后运行 `TCP-sender.exe`
