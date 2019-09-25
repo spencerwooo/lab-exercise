@@ -64,8 +64,10 @@ public class FtpClient {
         } catch (SAXException e) {
             e.printStackTrace();
         }
-        System.out.println(myclient.getGreeting());
+
+        System.out.println(myclient.getGreeting() + "\n");
         myclient.open();
+        System.out.println();
 
         String command = "";
         Scanner scanner = new Scanner(System.in);
@@ -76,29 +78,34 @@ public class FtpClient {
                 case "upload":
                     File myfile = new File(uploadfile);
                     myclient.putFileToPath(myfile, uploadfilepath);
+                    System.out.println();
                     break;
                 case "download":
                     myclient.downloadFile(downloadfile, downloadfilepath);
+                    System.out.println();
                     break;
                 case "list":
                     myclient.listFiles(listpath);
+                    System.out.println();
                     break;
                 case "info":
                     System.out.println("list - Lists files under path " + listpath);
                     System.out.println("upload - Upload file: " + uploadfile + "; Upload file path: " + uploadfilepath);
                     System.out.println("download - Download file: " + downloadfile + "; Download file path: " + downloadfilepath);
+                    System.out.println();
                     break;
                 case "help":
                     System.out.println("list - Lists all files under desired path.");
                     System.out.println("upload - Upload desired file to remote server.");
                     System.out.println("download - Download desired file to local machine.");
-                    System.out.println("q - Exit FTP Client.");
+                    System.out.println("info - Look information about FTP client.");
+                    System.out.println("q - Exit FTP Client.\n");
                     break;
                 case "q":
-                    System.out.println("Bye!");
+                    System.out.println("Bye!\n");
                     break;
                 default:
-                    System.out.println("Illegal command. Type \"help\" to see all commands available.");
+                    System.out.println("Illegal command. Type \"help\" to see all commands available.\n");
             }
         }
 
