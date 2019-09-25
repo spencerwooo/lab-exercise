@@ -33,7 +33,7 @@ dependencies {
 
 application {
     // Define the main class for the application
-    mainClassName = 'ftp.client.App'
+    mainClassName = 'ftp.client.FtpClient'
 }
 
 run {
