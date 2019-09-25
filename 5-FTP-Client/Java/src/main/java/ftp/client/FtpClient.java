@@ -119,6 +119,7 @@ public class FtpClient {
         }
 
         client.close();
+        scanner.close();
     }
 
     /**
