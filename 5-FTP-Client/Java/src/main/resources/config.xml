@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <ftp>
+        <host>pi-v4.felinae98.ml</host>
+        <port>2121</port>
+        <username>spencer</username>
+        <password>123</password>
+    </ftp>
+    <file>
+        <uploadfile>C:\Users\Garvey\Documents\tym.txt</uploadfile>
+        <uploadfilepath>ftpfiletest/upload.txt</uploadfilepath>
+        <downloadfile>ftpfiletest/1.txt</downloadfile>
+        <downloadfilepath>downloadfile.txt</downloadfilepath>
+        <listpath>ftpfiletest</listpath>
+    </file>
+</config>
