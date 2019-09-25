@@ -6,7 +6,6 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -15,83 +14,93 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class FtpClient {
 
+    // FTP server configurations
     private static String server;
     private static int port;
+
+    // FTP username & password
     private static String user;
     private static String password;
-    private static String uploadfile;
-    private static String uploadfilepath;
-    private static String downloadfile;
-    private static String downloadfilepath;
-    private static String listpath;
+
+    // Upload/download file path
+    private static String uploadFile;
+    private static String uploadFilePath;
+    private static String downloadFile;
+    private static String downloadFilePath;
+
+    // List all files under path
+    private static String listPath;
     private FTPClient ftp;
 
     FtpClient() {
     }
 
     public static void main(String[] args) throws IOException, ParserConfigurationException {
-        FtpClient myclient = new FtpClient();
-        File configfile = new File(FtpClient.class.getResource("/config.xml").getFile());
+        FtpClient client = new FtpClient();
+        File configFile = new File(FtpClient.class.getResource("/config.xml").getFile());
+
+        // Parse configuration file
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(configfile);
+
+            Document doc = db.parse(configFile);
+
             NodeList ftpList = doc.getElementsByTagName("ftp");
             for (int i = 0; i < ftpList.getLength(); i++) {
                 Element n = (Element) ftpList.item(i);
-                NamedNodeMap node = n.getAttributes();
                 server = n.getElementsByTagName("host").item(0).getFirstChild().getNodeValue();
                 port = Integer.parseInt(n.getElementsByTagName("port").item(0).getFirstChild().getNodeValue());
                 user = n.getElementsByTagName("username").item(0).getFirstChild().getNodeValue();
                 password = n.getElementsByTagName("password").item(0).getFirstChild().getNodeValue();
             }
+
             NodeList fileList = doc.getElementsByTagName("file");
             for (int i = 0; i < fileList.getLength(); i++) {
                 Element n = (Element) fileList.item(i);
-                NamedNodeMap node = n.getAttributes();
-                uploadfile = n.getElementsByTagName("uploadfile").item(0).getFirstChild().getNodeValue();
-                uploadfilepath = n.getElementsByTagName("uploadfilepath").item(0).getFirstChild().getNodeValue();
-                downloadfile = n.getElementsByTagName("downloadfile").item(0).getFirstChild().getNodeValue();
-                downloadfilepath = n.getElementsByTagName("downloadfilepath").item(0).getFirstChild().getNodeValue();
-                listpath = n.getElementsByTagName("listpath").item(0).getFirstChild().getNodeValue();
+                uploadFile = n.getElementsByTagName("uploadfile").item(0).getFirstChild().getNodeValue();
+                uploadFilePath = n.getElementsByTagName("uploadfilepath").item(0).getFirstChild().getNodeValue();
+                downloadFile = n.getElementsByTagName("downloadfile").item(0).getFirstChild().getNodeValue();
+                downloadFilePath = n.getElementsByTagName("downloadfilepath").item(0).getFirstChild().getNodeValue();
+                listPath = n.getElementsByTagName("listpath").item(0).getFirstChild().getNodeValue();
             }
         } catch (SAXException e) {
             e.printStackTrace();
         }
 
-        System.out.println(myclient.getGreeting() + "\n");
-        myclient.open();
+        System.out.println(client.getGreeting() + "\n");
+        client.open();
         System.out.println();
 
         String command = "";
         Scanner scanner = new Scanner(System.in);
 
+        // Deal with user input
         while (!command.equals("q")) {
             command = scanner.nextLine();
             switch (command) {
                 case "upload":
-                    File myfile = new File(uploadfile);
-                    myclient.putFileToPath(myfile, uploadfilepath);
+                    File fileToUpload = new File(uploadFile);
+                    client.putFileToPath(fileToUpload, uploadFilePath);
                     System.out.println();
                     break;
                 case "download":
-                    myclient.downloadFile(downloadfile, downloadfilepath);
+                    client.downloadFile(downloadFile, downloadFilePath);
                     System.out.println();
                     break;
                 case "list":
-                    myclient.listFiles(listpath);
+                    client.listFiles(listPath);
                     System.out.println();
                     break;
                 case "info":
-                    System.out.println("list - Lists files under path " + listpath);
-                    System.out.println("upload - Upload file: " + uploadfile + "; Upload file path: " + uploadfilepath);
-                    System.out.println("download - Download file: " + downloadfile + "; Download file path: " + downloadfilepath);
+                    System.out.println("list - Lists files under path " + listPath);
+                    System.out.println("upload - Upload file: " + uploadFile + "; Upload file path: " + uploadFilePath);
+                    System.out.println("download - Download file: " + downloadFile + "; Download file path: " + downloadFilePath);
                     System.out.println();
                     break;
                 case "help":
@@ -109,9 +118,14 @@ public class FtpClient {
             }
         }
 
-        myclient.close();
+        client.close();
     }
 
+    /**
+     * FTP connection open port
+     *
+     * @throws IOException
+     */
     public void open() throws IOException {
         ftp = new FTPClient();
 
@@ -127,24 +141,43 @@ public class FtpClient {
         ftp.login(user, password);
     }
 
+    /**
+     * FTP connection close
+     * @throws IOException
+     */
     public void close() throws IOException {
         ftp.disconnect();
     }
 
-    public Collection<String> listFiles(String path) throws IOException {
+    /**
+     * List all files under desired path
+     *
+     * @param path
+     * @throws IOException
+     */
+    public void listFiles(String path) throws IOException {
         FTPFile[] files = ftp.listFiles(path);
         System.out.println(Arrays.stream(files)
                 .map(FTPFile::getName)
                 .collect(Collectors.toList()));
-        return Arrays.stream(files)
-                .map(FTPFile::getName)
-                .collect(Collectors.toList());
     }
 
+    /**
+     * Store file onto FIP server
+     * @param file
+     * @param path
+     * @throws IOException
+     */
     public void putFileToPath(File file, String path) throws IOException {
         ftp.storeFile(path, new FileInputStream(file));
     }
 
+    /**
+     * Download file from FTP server
+     * @param source
+     * @param destination
+     * @throws IOException
+     */
     public void downloadFile(String source, String destination) throws IOException {
         FileOutputStream out = new FileOutputStream(destination);
         ftp.retrieveFile(source, out);
