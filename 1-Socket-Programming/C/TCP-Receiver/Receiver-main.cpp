@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <Winsock2.h> //windows socket的头文件
+#include <Winsock2.h>
 #include <iostream>
 using namespace std;
 
@@ -33,7 +33,7 @@ int main()
 	//INADDR_ANY就是指定地址为0.0.0.0的地址,
 	//表示不确定地址,或“任意地址”。”
 	addrSrv.sin_family = AF_INET;
-	addrSrv.sin_port = htons(4000);//htons用来将主机字节顺序转换为网络字节顺序(to network short)
+	addrSrv.sin_port = htons(8888);//htons用来将主机字节顺序转换为网络字节顺序(to network short)
 
 	bind(sockSrv, (SOCKADDR*)& addrSrv, sizeof(SOCKADDR));//将本地地址绑定到所创建的socket上，以使在网络上标识该socket
 
@@ -45,9 +45,9 @@ int main()
 	while (1)
 	{
 		SOCKET sockConn = accept(sockSrv, (SOCKADDR*)& addrClient, &len);//为一个连接请求提供服务。addrClient包含了发出连接请求的客户机IP地址信息；返回的新socket描述服务器与该客户机的连接
-
+		
 		char sendBuf[50];
-		sprintf(sendBuf, "Welcome %s to here!", inet_ntoa(addrClient.sin_addr));//inet_ntoa网络地址转换转点分十进制的字符串指针
+		sprintf(sendBuf, "TEMPERATURE = 60 HUMIDITY = 0 LIGHT = 1");
 		send(sockConn, sendBuf, strlen(sendBuf) + 1, 0);
 
 		char recvBuf[50];

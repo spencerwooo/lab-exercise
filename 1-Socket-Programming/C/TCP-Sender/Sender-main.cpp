@@ -27,9 +27,9 @@ int main()
 		SOCKET sockClient = socket(AF_INET, SOCK_STREAM, 0);
 
 		SOCKADDR_IN addrClt;//需要包含服务端IP信息
-		addrClt.sin_addr.S_un.S_addr = inet_addr("192.168.0.30");// inet_addr将IP地址从点数格式转换成网络字节格式整型。
+		addrClt.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");// inet_addr将IP地址从点数格式转换成网络字节格式整型。
 		addrClt.sin_family = AF_INET;
-		addrClt.sin_port = htons(4000);
+		addrClt.sin_port = htons(8888);
 
 		connect(sockClient, (SOCKADDR*)& addrClt, sizeof(SOCKADDR));//客户机向服务器发出连接请求
 		char recvBuf[50];
@@ -38,7 +38,7 @@ int main()
 
 		char sendBuf[50];
 		sprintf(sendBuf, "%3d,", index);
-		strcat(sendBuf, "server node of: yaopeng");
+		strcat(sendBuf, "client: aqi");
 		send(sockClient, sendBuf, strlen(sendBuf) + 1, 0);
 
 		closesocket(sockClient);
