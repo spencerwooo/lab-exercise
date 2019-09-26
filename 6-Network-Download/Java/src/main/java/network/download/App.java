@@ -3,12 +3,104 @@
  */
 package network.download;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 public class App {
-    public String getGreeting() {
-        return "Hello world.";
+
+    private static String getCurrentTime() {
+        // Get current time & date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy-HH-mm-ss", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return dateFormat.format(new Date());
     }
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+    public static void main(String[] args) throws IOException {
+        App app = new App();
+        System.out.println(app.getGreeting());
+
+        // Initialize downloader
+        Downloader downloader = new Downloader();
+
+        // Read from properties file
+        String propertyPath = "/config.properties";
+        Properties props = app.getProperties(propertyPath);
+        String downloadUrl = props.getProperty("network.download.url");
+        String downloadDestination = props.getProperty("network.download.destination");
+
+        // Resolve download file type
+        URI uri = URI.create(downloadUrl);
+        String urlFilePath = uri.getPath();
+        String urlFileName = urlFilePath.substring(urlFilePath.lastIndexOf('/') + 1);
+        String downloadedFileName = "downloader_" + getCurrentTime() + "_" + urlFileName;
+
+        // Deal with user commands
+        Scanner scanner = new Scanner(System.in);
+        String command = "";
+        while (!(command.equals("quit") || command.equals("q"))) {
+            System.out.print("> ");
+            command = scanner.nextLine();
+
+            switch (command) {
+                case "help":
+                case "h":
+                    System.out.println("[DOWNLOADER] Help:");
+                    System.out.println("  info, i- Prints out detailed configurations.");
+                    System.out.println("  download, d - Starts downloading.");
+                    System.out.println("  help, h - Prints this help message.");
+                    break;
+                case "info":
+                case "i":
+                    System.out.println("[DOWNLOADER] Info:");
+                    System.out.println("  Download file URL: " + downloadUrl);
+                    System.out.println("  Download destination: " + downloadDestination);
+                    System.out.println("  Download file name: " + downloadedFileName);
+                    System.out.println("  Complete download file path: " +
+                            Paths.get(System.getProperty("user.home"), downloadDestination, downloadedFileName));
+                    break;
+                case "download":
+                case "d":
+                    try {
+                        downloader.downloadFile(downloadUrl, downloadDestination, downloadedFileName);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "quit":
+                case "q":
+                    System.out.println("[DOWNLOADER] Bye!");
+                    break;
+                default:
+                    System.out.println("[DOWNLOADER] Invalid command. " +
+                            "Type \"help\" to show a list of commands available.");
+                    break;
+            }
+        }
+        scanner.close();
+    }
+
+    public String getGreeting() {
+        return "[DOWNLOADER] Welcome to web downloader.\n  Type \"help\" for a list of commands available.";
+    }
+
+    /**
+     * Get properties from configuration file
+     *
+     * @param propertiesPath: configuration file path
+     * @throws IOException: File not found exception
+     * @return: Properties
+     */
+    private Properties getProperties(String propertiesPath) throws IOException {
+        InputStream propertyStream = getClass().getResourceAsStream(propertiesPath);
+        Properties properties = new Properties();
+        InputStreamReader inputStreamReader = new InputStreamReader(propertyStream, StandardCharsets.UTF_8);
+        properties.load(inputStreamReader);
+        return properties;
     }
 }
