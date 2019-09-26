@@ -30,9 +30,5 @@ dependencies {
 
 application {
     // Define the main class for the application
-    mainClassName = 'network.download.App'
-}
-
-run {
-    standardInput = System.in
+    mainClassName = 'web.proxy.App'
 }
