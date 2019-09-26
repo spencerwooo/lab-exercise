@@ -1,12 +1,45 @@
 #include <Winsock2.h>
+#include <Windows.h>
 #include <iostream>
 #include <cstdio>
 using namespace std;
 
 #pragma comment( lib, "ws2_32.lib" )// 链接Winsock2.h的静态库文件
 
+SOCKET sockConn;
+
+DWORD WINAPI ThreadFunc(LPVOID);
+
+DWORD WINAPI ThreadFunc(LPVOID p)
+{
+	cout << "cao" << endl;
+
+	char sendBuf[5000];
+	sprintf(sendBuf, "HTTP/1.1 200 OK\r\n"\
+		"Server: Potato server v0.0.1\r\n"\
+		"Date: \r\nContent-Type: text/html\r\n\r\n"\
+		"<html><p><h3>Server Worker:</h3></p><p> 哦吼 </p></html>");
+	send(sockConn, sendBuf, strlen(sendBuf) + 1, 0);
+
+	char recvBuf[5000];
+	memset(recvBuf, 0, sizeof(recvBuf));
+	recv(sockConn, recvBuf, 5000, 0);
+	printf("%s\n", recvBuf);
+
+	closesocket(sockConn);
+
+	return 0;
+}
+
+
 int main()
 {
+
+	HANDLE hThread;
+	DWORD  threadId;
+
+	
+
 	//初始化winsocket
 	WORD wVersionRequested;
 	WSADATA wsaData;
@@ -44,22 +77,11 @@ int main()
 
 	while (1)
 	{
-		SOCKET sockConn = accept(sockSrv, (SOCKADDR*)& addrClient, &len);//为一个连接请求提供服务。addrClient包含了发出连接请求的客户机IP地址信息；返回的新socket描述服务器与该客户机的连接
+		sockConn = accept(sockSrv, (SOCKADDR*)& addrClient, &len);//为一个连接请求提供服务。addrClient包含了发出连接请求的客户机IP地址信息；返回的新socket描述服务器与该客户机的连接
+		
+		hThread = CreateThread(NULL, 0, ThreadFunc, 0, 0, &threadId); // 创建线程
 
-		char sendBuf[5000];
-		sprintf(sendBuf, "HTTP/1.1 200 OK\r\n"\
-			"Server: Potato server v0.0.1\r\n"\
-			"Date: \r\nContent-Type: text/html\r\n\r\n"\
-			"<html><p><h3>Server Worker:</h3></p><p> 哦吼 </p></html>");
-		send(sockConn, sendBuf, strlen(sendBuf) + 1, 0);
-
-		char recvBuf[5000];
-		memset(recvBuf, 0, sizeof(recvBuf));
-		recv(sockConn, recvBuf, 5000, 0);
-		printf("%s\n", recvBuf);
-
-		closesocket(sockConn);
-		Sleep(2000);//2000毫秒
+		Sleep(2000);
 	}
 	WSACleanup();
 
