@@ -3,38 +3,16 @@
  */
 package network.download;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class App {
-
-    public String getGreeting() {
-        return "[DOWNLOADER] Welcome to web downloader.\n  Type \"help\" for a list of commands available.";
-    }
-
-    /**
-     * Get properties from configuration file
-     *
-     * @param propertiesPath: configuration file path
-     * @throws IOException: File not found exception
-     * @return: Properties
-     */
-    private Properties getProperties(String propertiesPath) throws IOException {
-        InputStream propertyStream = getClass().getResourceAsStream(propertiesPath);
-        Properties properties = new Properties();
-        InputStreamReader inputStreamReader = new InputStreamReader(propertyStream, StandardCharsets.UTF_8);
-        properties.load(inputStreamReader);
-        return properties;
-    }
 
     private static String getCurrentTime() {
         // Get current time & date
@@ -105,5 +83,24 @@ public class App {
             }
         }
         scanner.close();
+    }
+
+    public String getGreeting() {
+        return "[DOWNLOADER] Welcome to web downloader.\n  Type \"help\" for a list of commands available.";
+    }
+
+    /**
+     * Get properties from configuration file
+     *
+     * @param propertiesPath: configuration file path
+     * @throws IOException: File not found exception
+     * @return: Properties
+     */
+    private Properties getProperties(String propertiesPath) throws IOException {
+        InputStream propertyStream = getClass().getResourceAsStream(propertiesPath);
+        Properties properties = new Properties();
+        InputStreamReader inputStreamReader = new InputStreamReader(propertyStream, StandardCharsets.UTF_8);
+        properties.load(inputStreamReader);
+        return properties;
     }
 }

@@ -4,10 +4,9 @@ package network.download;
  * LoadingIndicator
  */
 public class LoadingIndicator extends Thread {
+    boolean loading = true;
     private String botName;
     private String greetings;
-
-    boolean loading = true;
 
     LoadingIndicator(String botName, String greetings) {
         this.botName = botName;
