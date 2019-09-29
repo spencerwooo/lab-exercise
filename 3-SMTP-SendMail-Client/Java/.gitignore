@@ -46,3 +46,5 @@ gradle-app.setting
 .settings/*
 .classpath
 .project
+
+.idea/*
