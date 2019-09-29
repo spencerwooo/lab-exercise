@@ -16,13 +16,11 @@ void sendMsg(const char* sendBuf)
 
 void receiveMsg()
 {
-	//cout << "yeah" << endl;
 	char recvBuf[5000];
 	memset(recvBuf, 0, sizeof(char) * 5000);
 	int num = recv(sockClient, recvBuf, 5000, 0);
 	cout << "recv:" << endl;
 	printf("%s\n", recvBuf);
-	//cout << "fuck" << endl;
 }
 
 int main()
@@ -49,7 +47,7 @@ int main()
 
 	SOCKADDR_IN addrClt;//需要包含服务端IP信息
 	//addrClt.sin_addr.S_un.S_addr = inet_addr("52.205.50.181");// inet_addr将IP地址从点数格式转换成网络字节格式整型。
-	addrClt.sin_addr.S_un.S_addr = inet_addr("14.18.245.164");// 
+	addrClt.sin_addr.S_un.S_addr = inet_addr("14.18.245.164");// qq SMTP 服务器ip地址 smtp.qq.com
 	addrClt.sin_family = AF_INET;
 	addrClt.sin_port = htons(25);//smtp端口
 
@@ -63,11 +61,11 @@ int main()
 	receiveMsg();
 
 	//sendMsg("MGYyNDAxN2M0YmY1YjA=\r\n"); // 发送 用户名 (base64加密)
-	sendMsg("MTc1MTE4NDgxOQ==\r\n"); // 发送 用户名 (base64加密)
+	sendMsg("MTc1MTE4NDgxOQ==\r\n"); // 发送 用户名 (QQ号 base64加密)
 	receiveMsg();
 
 	//sendMsg("M2I1YzRjNTQ3MGI1MmI=\r\n"); // 发送 密码 (base64加密)
-	sendMsg("d3FveWthZ3dod3BnYmlkaQ==\r\n"); // 发送 密码 (QQ是授权码 base64加密)
+	sendMsg("*********************\r\n"); // 发送 密码 (QQ是授权码, 这里省略 base64加密)
 	receiveMsg();
 
 	//sendMsg("MAIL FROM: <archie@WoTaMaTaiNiuBiLe.com>\r\n"); // 发送 
