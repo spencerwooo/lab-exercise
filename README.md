@@ -11,7 +11,7 @@
 |   1. Socket Programming   |   ✅   |   ✅   |   ✅    |
 | 2. Multithread Web Server |  ✅   |   ✅   |   ✅    |
 |  3. SMTP SendMail Client  |  ✅   |   ✅   |   ✅    |
-|    4. POP3 Mail Client    |       |   ✅   |        |
+|    4. POP3 Mail Client    |  ✅   |   ✅   |        |
 |       5. FTP Client       |       |   ✅   |        |
 |    6. Network Download    |       |       |        |
 |       7. Web Proxy        |       |       |        |
