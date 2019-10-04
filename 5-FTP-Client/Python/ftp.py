@@ -17,7 +17,7 @@ def main():
 		ftp.storbinary("STOR %s"% name,upload)
 		upload.close()
 		print("SUCCESS!")
-	
+
 
 	elif welcome_word == "d":
 		file_name = input("SHOW ME THE NAME:")
