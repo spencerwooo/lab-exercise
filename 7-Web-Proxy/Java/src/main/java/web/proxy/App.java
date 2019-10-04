@@ -3,12 +3,121 @@
  */
 package web.proxy;
 
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+
 public class App {
-    public String getGreeting() {
-        return "Hello world.";
+
+    private static void startServer(String host, int localPort, int remotePort) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(localPort);
+
+        final byte[] request = new byte[1024];
+        byte[] response = new byte[1024];
+
+        System.out.println("[PROXY SERVER] Listening on port " + localPort);
+
+        while (true) {
+            Socket client = null;
+            Socket server = null;
+
+            try {
+                // Waiting for local socket connection
+                client = serverSocket.accept();
+
+                final InputStream fromClient = client.getInputStream();
+                final OutputStream toClient = client.getOutputStream();
+
+                // Make connection to real server
+                try {
+                    server = new Socket(host, remotePort);
+                    System.out.println("[PROXY SERVER] Connected to host " + host + ":" + remotePort);
+                } catch (IOException e) {
+                    String errorMessage = "[PROXY SERVER] Cannot connect to remote server.";
+                    System.out.println(errorMessage + "\n" + e);
+                    PrintWriter out = new PrintWriter(new OutputStreamWriter(toClient));
+                    out.println(errorMessage + "\n" + e);
+                    out.flush();
+                    client.close();
+                    continue;
+                }
+
+                final InputStream fromServer = server.getInputStream();
+                final OutputStream toServer = server.getOutputStream();
+
+                // Start new thread to read client's request and pass them to the server
+                Thread thread = new Thread(() -> {
+                    int bytesRead;
+
+                    try {
+                        while ((bytesRead = fromClient.read(request)) != -1) {
+                            toServer.write(request, 0, bytesRead);
+                            System.out.println("[PROXY SERVER] Request from client:\n"
+                                    + new String(request, StandardCharsets.UTF_8).trim());
+                            toServer.flush();
+                        }
+                    } catch (IOException e) {
+                        // Do nothing
+                    }
+
+                    try {
+                        toServer.close();
+                    } catch (IOException e) {
+                        // Do nothing
+                    }
+                });
+
+                thread.start();
+
+                // Meanwhile read the server's response and pass them to client
+                int bytesRead;
+                try {
+                    while ((bytesRead = fromServer.read(response)) != -1) {
+                        toClient.write(response, 0, bytesRead);
+                        System.out.println("[PROXY SERVER] Response from server:\n"
+                                + new String(response, StandardCharsets.UTF_8).trim());
+                        toClient.flush();
+                    }
+                } catch (IOException e) {
+                    // Do nothing
+                }
+
+                // Server closed its connection to us, so we close our connection with client
+                toClient.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (server != null) {
+                        server.close();
+                    }
+                    if (client != null) {
+                        client.close();
+                    }
+                } catch (IOException e) {
+                    // Do nothing
+                }
+            }
+        }
     }
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+    public static void main(String[] args) throws IOException {
+        // Remote host: http://example.com 93.184.216.34
+        String host = "93.184.216.34";
+        // Listening on local port: 9000
+        int localPort = 9000;
+        // Default HTTP port: 80
+        int remotePort = 80;
+
+        App app = new App();
+        System.out.println(app.getGreeting());
+
+        startServer(host, localPort, remotePort);
+    }
+
+    public String getGreeting() {
+        return "[PROXY SERVER] Welcome to Proxy Server.";
     }
 }
