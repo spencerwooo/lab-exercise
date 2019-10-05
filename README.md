@@ -14,7 +14,7 @@
 |    4. POP3 Mail Client    |   ✅   |   ✅   |   ✅    |
 |       5. FTP Client       |   ✅   |   ✅   |   ✅    |
 |    6. Network Download    |   ✅   |   ✅   |   ✅    |
-|       7. Web Proxy        |       |       |        |
+|       7. Web Proxy        |   ✅   |   ✅   |   ✅    |
 
 ---
 
